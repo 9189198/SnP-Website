@@ -1,0 +1,226 @@
+﻿---
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+  { href: '/services', label: 'Services' },
+  { href: '/events', label: 'Events' },
+  { href: '/cafe', label: 'Cafe' },
+  { href: '/indulge', label: 'Indulge' },
+  { href: '/ordering', label: 'Order' },
+  { href: '/contact', label: 'Contact' },
+];
+
+const currentPath = Astro.url.pathname;
+const user = Astro.locals.user;
+---
+<header class="header">
+  <div class="container header__inner">
+    <a href="/" class="header__logo">
+      <img src="/images/snp.jpg" alt="SNP" />
+    </a>
+    <nav class="header__nav" id="main-nav">
+      {navLinks.map(link => (
+        <a
+          href={link.href}
+          class:list={['header__link', { active: currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href)) }]}
+        >
+          {link.label}
+        </a>
+      ))}
+      <span class="header__divider" aria-hidden="true"></span>
+      {user ? (
+        <Fragment>
+          {user.role === 'admin' && (
+            <a
+              href="/admin"
+              class:list={['header__link', 'header__link--account', { active: currentPath.startsWith('/admin') }]}
+            >
+              Admin
+            </a>
+          )}
+          <span class="header__link header__link--account header__user">{user.name || user.email}</span>
+          <button type="button" class="header__link header__logout" data-logout>Log out</button>
+        </Fragment>
+      ) : (
+        <Fragment>
+          <a
+            href="/login"
+            class:list={['header__link', 'header__link--account', { active: currentPath.startsWith('/login') }]}
+          >
+            Login
+          </a>
+          <a
+            href="/signup"
+            class:list={['header__link', 'header__link--account', { active: currentPath.startsWith('/signup') }]}
+          >
+            Sign up
+          </a>
+        </Fragment>
+      )}
+    </nav>
+    <a href="/contact" class="btn btn--primary header__cta">Start an Account</a>
+    <button class="header__toggle" id="nav-toggle" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<script>
+  const toggle = document.getElementById('nav-toggle');
+  const nav = document.getElementById('main-nav');
+  toggle?.addEventListener('click', () => {
+    nav?.classList.toggle('open');
+    toggle.classList.toggle('open');
+  });
+
+  const logout = document.querySelector('[data-logout]');
+  logout?.addEventListener('click', async () => {
+    logout.setAttribute('disabled', 'true');
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } finally {
+      window.location.assign('/');
+    }
+  });
+</script>
+
+<style>
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+  }
+  .header__logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.header__logo img {
+  aspect-ratio: 5 / 2;   /* 110px wide x 44px tall */
+  width: auto;
+  display: block;
+  height: 44px;
+  border-radius: 12px;
+  object-fit: cover; 
+}
+  .header__logo-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--color-primary);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    border-radius: var(--radius-sm);
+  }
+  .header__logo-text {
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: -0.01em;
+  }
+  .header__nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xl);
+  }
+  /* tighter spacing on mid-size screens so the account links still fit */
+  @media (max-width: 1280px) and (min-width: 1101px) {
+    .header__nav { gap: var(--space-lg); }
+    .header__divider { display: none; }
+  }
+  .header__link {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    transition: var(--transition);
+    position: relative;
+  }
+  .header__link:hover,
+  .header__link.active {
+    color: var(--color-text);
+  }
+  .header__link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--color-accent);
+  }
+  .header__divider {
+    width: 1px;
+    height: 18px;
+    background: var(--color-border);
+  }
+  .header__user {
+    color: var(--color-text);
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .header__logout {
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 0.875rem;
+    cursor: pointer;
+    padding: 0;
+  }
+  .header__logout:hover {
+    color: var(--color-text);
+  }
+  .header__cta {
+    font-size: 0.85rem;
+    padding: 0.6rem 1.25rem;
+  }
+  .header__toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .header__toggle span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--color-primary);
+    transition: var(--transition);
+  }
+  @media (max-width: 1100px) {
+    .header__nav {
+      display: none;
+      position: absolute;
+      top: 72px;
+      left: 0;
+      right: 0;
+      background: var(--color-surface);
+      flex-direction: column;
+      padding: var(--space-xl);
+      gap: var(--space-lg);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .header__nav.open { display: flex; }
+    .header__divider { width: 100%; height: 1px; }
+    .header__cta { display: none; }
+    .header__toggle { display: flex; }
+  }
+</style>

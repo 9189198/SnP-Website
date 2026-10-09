@@ -1,0 +1,186 @@
+﻿---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import CTABanner from '../components/CTABanner.astro';
+---
+<Layout title="Corporate Food Services">
+  <Header />
+
+  <div class="page-header page-header--dark">
+    <div class="container">
+      <span class="label">What We Deliver</span>
+      <h1>Corporate Food Services</h1>
+      <p>Three services, one account. Feed the working day, whatever shape it takes. Ordered in five minutes, delivered on schedule across Metro Cebu.</p>
+    </div>
+  </div>
+
+  <section>
+    <div class="container">
+      <div class="services-highlights fade-in">
+        <div class="highlight">
+          <span class="highlight__number">5 min</span>
+          <span class="highlight__label">To Place an Order</span>
+        </div>
+        <div class="highlight">
+          <span class="highlight__number">2 days</span>
+          <span class="highlight__label">Bulk Lead Time</span>
+        </div>
+        <div class="highlight">
+          <span class="highlight__number">Metro Cebu</span>
+          <span class="highlight__label">Delivery Coverage</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <SectionHeader
+        label="Our Services"
+        title="Three Ways to Feed Your Team"
+        description="Everyday employee meals, informal office sharing and professionally hosted events — ordered from one partner, on one account."
+      />
+      <div class="grid-3">
+        <ServiceCard
+          image="/images/packmeal.jpg"
+          title="Everyday Teams"
+          description="Individual meals for early starts, everyday lunches, training days and recurring team requirements. Set a weekly programme or order as needed."
+          items={['Breakfast', 'Lunch', 'Shift Meals']}
+          ctaHref="https://cebufoodtrays.com/packed-meals/"
+          ctaLabel="Order Packed Meals"
+        />
+        <ServiceCard
+          image="/images/foodtray.jpg"
+          title="Shared Occasions"
+          description="Generous group trays for casual meetings, team celebrations and relaxed shared meals at the office. Ordered by headcount, delivered ready to serve."
+          items={['Meetings', 'Team Days', 'Celebrations']}
+          ctaHref="https://cebufoodtrays.com/#cft-catalogue"
+          ctaLabel="Browse Food Trays"
+        />
+        <ServiceCard
+          image="/images/catering.jpg"
+          title="Hosted Events"
+          description="Coordinated menus and professional service for meetings, conferences, company functions and business events. Full production and on-site service."
+          items={['Conferences', 'Functions', 'Launches']}
+          ctaHref="https://cebufoodtrays.com/catering-services/"
+          ctaLabel="Explore Catering"
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="how-it-works">
+    <div class="container">
+      <SectionHeader
+        label="Process"
+        title="The Five-Minute Order"
+        description="Ordered in five minutes. Corporate orders run through CebuFoodTrays.com; direct consumer delivery runs through snpeats.com."
+        center
+      />
+      <div class="steps-grid">
+        <div class="step fade-in">
+          <span class="step__number">01</span>
+          <h3>Choose</h3>
+          <p>Select packed meals, trays or catering.</p>
+        </div>
+        <div class="step fade-in">
+          <span class="step__number">02</span>
+          <h3>Schedule</h3>
+          <p>Set quantity, date and place of delivery.</p>
+        </div>
+        <div class="step fade-in">
+          <span class="step__number">03</span>
+          <h3>Confirm</h3>
+          <p>We acknowledge, prepare and deliver.</p>
+        </div>
+        <div class="step fade-in">
+          <span class="step__number">04</span>
+          <h3>Repeat</h3>
+          <p>Recurring programmes run on a standing schedule with monthly billing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CTABanner
+    title="Feed Your Working Day"
+    description="Tell us how your team eats. We will come back with a menu, a price and a delivery schedule."
+    ctaText="Start an Account"
+    ctaHref="/contact"
+  />
+
+  <Footer />
+</Layout>
+
+<style>
+  .services-highlights {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-4xl);
+    padding: var(--space-2xl) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .highlight {
+    text-align: center;
+    min-width: 140px;
+    flex: 0 1 auto;
+  }
+  .highlight__number {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: var(--space-xs);
+  }
+  .highlight__label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
+  }
+  .how-it-works {
+    background: var(--color-muted);
+  }
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-xl);
+  }
+  .step {
+    text-align: center;
+    padding: var(--space-xl);
+  }
+  .step__number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: var(--color-surface);
+    border: 2px solid var(--color-accent);
+    color: var(--color-accent);
+    font-weight: 700;
+    border-radius: 50%;
+    margin-bottom: var(--space-lg);
+  }
+  .step h3 {
+    margin-bottom: var(--space-sm);
+  }
+  .step p {
+    font-size: 0.9rem;
+  }
+  @media (max-width: 768px) {
+    .services-highlights {
+      flex-direction: column;
+      gap: var(--space-xl);
+    }
+  }
+  @media (max-width: 480px) {
+    .steps-grid { grid-template-columns: 1fr; }
+  }
+</style>

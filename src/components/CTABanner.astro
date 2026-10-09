@@ -1,0 +1,45 @@
+﻿---
+interface Props {
+  title: string;
+  description?: string;
+  ctaText?: string;
+  ctaHref?: string;
+}
+
+const { title, description, ctaText = 'Start an Account', ctaHref = '/contact' } = Astro.props;
+---
+<section class="cta-banner">
+  <div class="container text-center">
+    <h2 class="cta-banner__title">{title}</h2>
+    {description && <p class="cta-banner__desc">{description}</p>}
+    <div class="cta-banner__actions">
+      <a href={ctaHref} class="btn btn--white">{ctaText}</a>
+      <a href="/services" class="btn btn--outline" style="color:#fff;border-color:rgba(255,255,255,0.3)">View Services</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta-banner {
+    background: var(--color-primary);
+    padding: var(--space-4xl) 0;
+  }
+  .cta-banner__title {
+    color: #fff;
+    margin-bottom: var(--space-md);
+  }
+  .cta-banner__desc {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.05rem;
+    margin-bottom: var(--space-xl);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .cta-banner__actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+</style>

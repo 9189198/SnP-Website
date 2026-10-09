@@ -1,0 +1,189 @@
+﻿---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+---
+<Layout title="How to Order">
+  <Header />
+
+  <div class="page-header">
+    <div class="container">
+      <span class="label">Ordering</span>
+      <h1>How You Order</h1>
+      <p>Two channels, one kitchen. Ordered in five minutes, confirmed and delivered on schedule.</p>
+    </div>
+  </div>
+
+  <section>
+    <div class="container">
+      <div class="channels-grid">
+        <div class="channel-card fade-in">
+          <div class="channel-card__header">
+            <span class="channel-card__badge">For Organizations</span>
+            <h2>Cebu Food Trays</h2>
+          </div>
+          <p>Packed meals, food trays and catering for offices, institutions and events. Company accounts, scheduled recurring orders, consolidated invoicing and a named coordinator.</p>
+          <ul class="channel-card__features">
+            <li>Company accounts</li>
+            <li>Recurring orders</li>
+            <li>Consolidated invoicing</li>
+            <li>Named coordinator</li>
+          </ul>
+          <a href="https://cebufoodtrays.com" class="btn btn--primary" target="_blank">Visit CebuFoodTrays.com</a>
+        </div>
+        <div class="channel-card fade-in">
+          <div class="channel-card__header">
+            <span class="channel-card__badge">For Individuals</span>
+            <h2>Stone and Pebble Cafe</h2>
+          </div>
+          <p>Direct delivery and pickup across the ESP menu, including Indulge desserts, cakes and drinks. Useful for small team orders and same-day requests below tray volumes.</p>
+          <ul class="channel-card__features">
+            <li>Direct delivery &amp; pickup</li>
+            <li>Same-day requests</li>
+            <li>Indulge desserts</li>
+            <li>No minimum order</li>
+          </ul>
+          <a href="https://snpeats.com" class="btn btn--outline" target="_blank">Visit SnpEats.com</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bulk-info">
+    <div class="container">
+      <SectionHeader
+        label="Bulk Orders"
+        title="Two-Day Lead Time"
+        description="Bulk deliveries are confirmed on a two-day lead time. This ensures production quality and reliable scheduling."
+        center
+      />
+      <div class="info-row">
+        <div class="info-item fade-in">
+          <h3>Order</h3>
+          <p>Online at cebufoodtrays.com, email stoneandpebblecafe@gmail.com or call +63 0945 987 5573.</p>
+        </div>
+        <div class="info-item fade-in">
+          <h3>Schedule</h3>
+          <p>Set quantity, delivery date and location. We confirm within the same business day.</p>
+        </div>
+        <div class="info-item fade-in">
+          <h3>Receiving</h3>
+          <p>Recurring programmes run on a standing schedule with monthly billing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="accounts-section">
+    <div class="container container--narrow">
+      <SectionHeader
+        label="Accounts"
+        title="Standing Programmes"
+        description="Recurring meal programmes run on a standing schedule with monthly billing. Set it up once, and we deliver on time every time."
+        center
+      />
+      <div class="accounts-cta text-center">
+        <a href="/contact" class="btn btn--primary">Start an Account</a>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</Layout>
+
+<style>
+  .channels-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-xl);
+  }
+  .channel-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2xl);
+    transition: var(--transition);
+  }
+  .channel-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  }
+  .channel-card__header {
+    margin-bottom: var(--space-lg);
+  }
+  .channel-card__badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    background: rgba(200, 169, 110, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    margin-bottom: var(--space-md);
+  }
+  .channel-card h2 {
+    font-size: 1.75rem;
+  }
+  .channel-card p {
+    font-size: 0.95rem;
+    margin-bottom: var(--space-lg);
+  }
+  .channel-card__features {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xl);
+  }
+  .channel-card__features li {
+    font-size: 0.9rem;
+    padding-left: 1.25rem;
+    position: relative;
+    color: var(--color-text-secondary);
+  }
+  .channel-card__features li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+  .bulk-info {
+    background: var(--color-muted);
+  }
+  .info-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+  }
+  .info-item {
+    background: var(--color-surface);
+    padding: var(--space-2xl);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    text-align: center;
+  }
+  .info-item h3 {
+    margin-bottom: var(--space-sm);
+    color: var(--color-primary);
+  }
+  .info-item p {
+    font-size: 0.9rem;
+  }
+  .accounts-section {
+    background: var(--color-bg);
+  }
+  .accounts-cta {
+    margin-top: var(--space-xl);
+  }
+  @media (max-width: 768px) {
+    .channels-grid { grid-template-columns: 1fr; }
+    .info-row { grid-template-columns: 1fr; }
+  }
+</style>

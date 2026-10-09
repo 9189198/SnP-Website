@@ -1,0 +1,141 @@
+﻿---
+interface Props {
+  image?: string;
+  title: string;
+  description: string;
+  items?: string[];
+  ctaHref?: string;
+  ctaLabel?: string;
+}
+
+const { image, title, description, items = [], ctaHref, ctaLabel = 'Order Now' } = Astro.props;
+---
+<div class="service-card fade-in">
+  {image && (
+    <div class="service-card__image">
+      <img src={image} alt={title} loading="lazy" />
+    </div>
+  )}
+  <h3 class="service-card__title">{title}</h3>
+  <p class="service-card__desc">{description}</p>
+  {items.length > 0 && (
+    <ul class="service-card__items">
+      {items.map(item => <li>{item}</li>)}
+    </ul>
+  )}
+  {ctaHref && (
+    <a class="service-card__cta" href={ctaHref}>
+      {ctaLabel}
+      <span class="service-card__cta-arrow" aria-hidden="true">&rarr;</span>
+    </a>
+  )}
+</div>
+
+<style>
+  .service-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-2xl);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: var(--transition);
+    min-height: 100%;
+  }
+
+  .service-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  }
+
+  .service-card__image {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    margin-bottom: var(--space-xl);
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+
+  .service-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .service-card__title {
+    margin-bottom: var(--space-md);
+    font-size: 1.25rem;
+  }
+
+  .service-card__desc {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: var(--space-xl);
+  }
+
+  .service-card__items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-xl);
+  }
+
+  .service-card__items li {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text);
+    padding-left: 1rem;
+    position: relative;
+  }
+
+  .service-card__items li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+
+  /* Button */
+  .service-card__cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+
+    margin-top: auto;
+    padding: 0.75rem 1.25rem;
+
+    background: var(--color-accent);
+    color: var(--color-surface);
+
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-sm);
+
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+
+    transition: var(--transition);
+  }
+
+  .service-card__cta:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+  }
+
+  .service-card__cta-arrow {
+    transition: var(--transition);
+  }
+
+  .service-card__cta:hover .service-card__cta-arrow {
+    transform: translateX(3px);
+  }
+</style>

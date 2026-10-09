@@ -1,0 +1,109 @@
+﻿---
+interface Props {
+  tagline?: string;
+  title: string;
+  subtitle?: string;
+  ctaText?: string;
+  ctaHref?: string;
+  ctaSecondary?: string;
+  ctaSecondaryHref?: string;
+  image?: string;
+  dark?: boolean;
+}
+
+const {
+  tagline = 'Corporate Food & Hospitality Partner',
+  title,
+  subtitle,
+  ctaText,
+  ctaHref = '/contact',
+  ctaSecondary,
+  ctaSecondaryHref = '/services',
+  image = 'images/cafe_bg.jpg',
+  dark = false,
+} = Astro.props;
+
+const useImage = Boolean(image) && !dark;
+---
+<section
+  class:list={['hero', { 'hero--image': useImage, 'hero--dark': dark }]}
+  style={useImage ? `--hero-image: url('${image}')` : undefined}
+>
+  <div class="container hero__inner">
+    <span class="label">{tagline}</span>
+    <h1 class="hero__title">{title}</h1>
+    {subtitle && <p class="hero__subtitle">{subtitle}</p>}
+    <div class="divider"></div>
+    <div class="hero__actions">
+      {ctaText && <a href={ctaHref} class="btn btn--primary">{ctaText}</a>}
+      {ctaSecondary && <a href={ctaSecondaryHref} class="btn btn--outline">{ctaSecondary}</a>}
+    </div>
+    <slot />
+  </div>
+</section>
+
+<style>
+  /* Background image with dark overlay */
+  .hero--image {
+    background:
+      linear-gradient(rgba(20, 18, 16, 0.7), rgba(20, 18, 16, 0.7)),
+      var(--hero-image) center / cover no-repeat;
+    color: var(--color-warm-white);
+  }
+  .hero--image .hero__title { color: var(--color-warm-white); }
+  .hero--image .hero__subtitle { color: rgba(250, 246, 239, 0.85); }
+
+  /* Solid dark variant (no image) */
+  .hero--dark {
+    background: var(--color-primary);
+    color: var(--color-warm-white);
+  }
+  .hero--dark .hero__title { color: var(--color-warm-white); }
+  .hero--dark .hero__subtitle { color: rgba(250, 246, 239, 0.75); }
+
+  /* Buttons on dark backgrounds (image or dark) */
+  .hero--image .btn--primary,
+  .hero--dark .btn--primary {
+    background-color: var(--color-accent);
+    color: var(--color-dark);
+  }
+  .hero--image .btn--primary:hover,
+  .hero--dark .btn--primary:hover {
+    background-color: var(--color-sky);
+  }
+  .hero--image .btn--outline,
+  .hero--dark .btn--outline {
+    color: var(--color-warm-white);
+    border-color: rgba(250, 246, 239, 0.4);
+  }
+  .hero--image .btn--outline:hover,
+  .hero--dark .btn--outline:hover {
+    background: var(--color-warm-white);
+    color: var(--color-dark);
+  }
+
+  .hero__inner {
+    max-width: 720px;
+    text-align: left;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .hero__actions {
+    justify-content: flex-start;
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    margin-top: 50px;
+  }
+  .hero__title {
+    margin-top: var(--space-sm);
+    margin-bottom: var(--space-lg);
+  }
+  .hero__subtitle {
+    font-size: 1.15rem;
+    max-width: 560px;
+  }
+  @media (max-width: 768px) {
+    .hero { padding: calc(var(--space-3xl) + 72px) 0 var(--space-3xl); }
+  }
+</style>

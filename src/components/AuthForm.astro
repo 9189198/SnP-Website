@@ -1,0 +1,247 @@
+---
+interface Props {
+  mode: 'login' | 'signup';
+  next?: string;
+}
+
+const { mode, next = '' } = Astro.props;
+---
+
+<form
+  class="auth-form"
+  id="auth-form"
+  data-mode={mode}
+  data-next={next}
+  data-login-url="/api/auth/login"
+  data-signup-url="/api/auth/signup"
+  novalidate
+>
+  <p class="auth-alert" data-alert role="alert" hidden></p>
+
+  {mode === 'signup' && (
+    <div class="form-group">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" name="name" autocomplete="name" placeholder="Juan Dela Cruz" />
+      <p class="field-error" data-error-for="name" hidden></p>
+    </div>
+  )}
+
+  <div class="form-group">
+    <label for="email">Email Address</label>
+    <input type="email" id="email" name="email" autocomplete="email" placeholder="you@email.com" />
+    <p class="field-error" data-error-for="email" hidden></p>
+  </div>
+
+  <div class="form-group">
+    <label for="password">Password</label>
+    <input
+      type="password"
+      id="password"
+      name="password"
+      autocomplete={mode === 'signup' ? 'new-password' : 'current-password'}
+      placeholder={mode === 'signup' ? 'At least 8 characters' : 'Your password'}
+    />
+    <p class="field-hint" data-hint hidden>
+      Minimum 8 characters, including at least one letter and one number.
+    </p>
+    <p class="field-error" data-error-for="password" hidden></p>
+  </div>
+
+  {mode === 'signup' && (
+    <div class="form-group">
+      <label for="confirm_password">Confirm Password</label>
+      <input type="password" id="confirm_password" name="confirm_password" autocomplete="new-password" />
+      <p class="field-error" data-error-for="confirm_password" hidden></p>
+    </div>
+  )}
+
+  <button type="submit" class="btn btn--primary btn--full" data-submit>
+    {mode === 'signup' ? 'Create Account' : 'Log In'}
+  </button>
+
+  <p class="auth-switch">
+    {mode === 'signup' ? (
+      <>Already have an account? <a href="/login">Log in</a></>
+    ) : (
+      <>New to ESP? <a href="/signup">Create an account</a></>
+    )}
+  </p>
+</form>
+
+<script>
+  interface AuthResponse {
+    ok: boolean;
+    error?: string;
+    errors?: Record<string, string>;
+    user?: { email: string; name: string; role: 'customer' | 'admin' };
+  }
+
+  const authForm = document.getElementById('auth-form') as HTMLFormElement | null;
+
+  if (authForm) {
+    const alertBox = authForm.querySelector<HTMLElement>('[data-alert]');
+    const submitButton = authForm.querySelector<HTMLButtonElement>('[data-submit]');
+    const hint = authForm.querySelector<HTMLElement>('[data-hint]');
+    const passwordInput = authForm.querySelector<HTMLInputElement>('#password');
+    const isSignup = authForm.getAttribute('data-mode') === 'signup';
+
+    const showAlert = (message: string, tone = 'error') => {
+      if (!alertBox) return;
+      alertBox.textContent = message;
+      alertBox.hidden = !message;
+      alertBox.setAttribute('data-tone', tone);
+    };
+
+    const clearErrors = () => {
+      authForm.querySelectorAll<HTMLElement>('[data-error-for]').forEach((node) => {
+        node.hidden = true;
+        node.textContent = '';
+      });
+      authForm.querySelectorAll('.invalid').forEach((node) => node.classList.remove('invalid'));
+    };
+
+    const applyErrors = (errors: Record<string, string> = {}) => {
+      Object.entries(errors).forEach(([field, message]) => {
+        const node = authForm.querySelector<HTMLElement>(`[data-error-for="${field}"]`);
+        if (node) {
+          node.textContent = message;
+          node.hidden = false;
+        }
+        const input = authForm.querySelector(`[name="${field}"]`);
+        if (input) input.classList.add('invalid');
+      });
+    };
+
+    authForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      clearErrors();
+      showAlert('');
+
+      const payload: Record<string, string> = {};
+      new FormData(authForm).forEach((value, key) => {
+        payload[key] = String(value);
+      });
+
+      const endpoint = isSignup ? authForm.getAttribute('data-signup-url') : authForm.getAttribute('data-login-url');
+      const label = submitButton?.textContent ?? '';
+      if (!endpoint) {
+        showAlert('This form is missing its endpoint. Please reload the page.');
+        return;
+      }
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = isSignup ? 'Creating account…' : 'Logging in…';
+      }
+
+      const restoreButton = () => {
+        if (!submitButton) return;
+        submitButton.disabled = false;
+        submitButton.textContent = label;
+      };
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const result = (await response.json().catch(() => ({}))) as AuthResponse;
+
+        if (!response.ok) {
+          showAlert(result.error || 'Something went wrong. Please try again.');
+          applyErrors(result.errors);
+          restoreButton();
+          return;
+        }
+
+        showAlert('Success. Taking you in…', 'success');
+        if (hint) hint.hidden = true;
+
+        const next = authForm.getAttribute('data-next');
+        const target = next || (result.user?.role === 'admin' ? '/admin' : '/cafe');
+        window.location.assign(target);
+      } catch {
+        showAlert('Could not reach the server. Please try again.');
+        restoreButton();
+      }
+    });
+
+    if (hint && isSignup) hint.hidden = false;
+    passwordInput?.addEventListener('input', () => {
+      if (hint && isSignup) hint.hidden = passwordInput.value.length > 0;
+    });
+  }
+</script>
+
+<style>
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  .form-group label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    color: var(--color-text);
+    background: var(--color-surface);
+    transition: var(--transition);
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+  }
+  .form-group input.invalid {
+    border-color: #b3402f;
+  }
+  .field-error {
+    font-size: 0.8rem;
+    color: #b3402f;
+  }
+  .field-hint {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+  }
+  .auth-alert {
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-md);
+    background: rgba(179, 64, 47, 0.08);
+    border: 1px solid rgba(179, 64, 47, 0.25);
+    color: #b3402f;
+    font-size: 0.875rem;
+  }
+  .auth-alert[data-tone='success'] {
+    background: rgba(201, 162, 75, 0.12);
+    border-color: rgba(201, 162, 75, 0.4);
+    color: var(--color-accent-dark);
+  }
+  .auth-switch {
+    font-size: 0.875rem;
+    text-align: center;
+  }
+  .auth-switch a {
+    color: var(--color-accent-dark);
+    font-weight: 500;
+  }
+  .btn--full {
+    width: 100%;
+    justify-content: center;
+    padding: var(--space-md) var(--space-xl);
+  }
+</style>

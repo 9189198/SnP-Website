@@ -1,0 +1,227 @@
+﻿---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Hero from '../components/Hero.astro';
+import StatCard from '../components/StatCard.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import CTABanner from '../components/CTABanner.astro';
+
+const clients = [
+  { name: 'Unilab', image: '/images/unilab.jpg' },
+  { name: 'PhilHealth', image: '/images/philhealth.png' },
+  { name: 'Chong Hua Hospital', image: '/images/chonghua.jpg' },
+  { name: 'Cebu Doctors University', image: '/images/cdu.jpg' },
+  { name: 'lyf', image: '/images/lyf.jpg' },
+  { name: 'Citadines', image: '/images/citadine.jpg' },
+];
+---
+<Layout title="Corporate Food & Hospitality Partner">
+  <Header />
+
+  <Hero
+    tagline="Corporate Food & Hospitality Partner"
+    title="Global Quality. Local Soul."
+    subtitle="Corporate food. Ordered in 5 minutes. Delivered on schedule. Earth Stone & Pebble develops food and hospitality businesses through shared commercial and operational capabilities."
+    ctaText="Start an Account"
+    ctaHref="/contact"
+    ctaSecondary="Our Services"
+    ctaSecondaryHref="/services"
+    image="/images/cafe_bg.jpg"
+  />
+
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <StatCard number="10,000+" label="Customers Served Monthly" />
+        <StatCard number="500+" label="Catering Events Served" />
+        <StatCard number="2 Days" label="Lead Time, Bulk Delivery" />
+        <StatCard number="40" label="Staff Across the Group" />
+      </div>
+    </div>
+  </section>
+
+  <section class="capabilities-section">
+    <div class="container">
+      <SectionHeader
+        label="The Group"
+        title="Four Capabilities, One Operation"
+        description="One kitchen operation behind every brand you order from. Brand building connects with kitchens, fulfilment, customer channels and data."
+        center
+      />
+      <div class="grid-2 capabilities-grid">
+        <div class="capability-card fade-in">
+          <span class="capability-card__status">Live</span>
+          <h3>Food Services</h3>
+          <p>Corporate catering, executive meal trays, workplace food programmes and event service for offices, institutions and large teams.</p>
+        </div>
+        <div class="capability-card fade-in">
+          <span class="capability-card__status">Live</span>
+          <h3>Digital Commerce</h3>
+          <p>cebufoodtrays.com for corporate ordering; snpeats.com for direct consumer delivery and pickup.</p>
+        </div>
+        <div class="capability-card fade-in">
+          <span class="capability-card__status">Live</span>
+          <h3>Hospitality</h3>
+          <p>Stone &amp; Pebble Cafe is the flagship, supported by Indulge. Both develop the recipes, standards and service the food business runs on.</p>
+        </div>
+        <div class="capability-card fade-in">
+          <span class="capability-card__status">In Production</span>
+          <h3>Systems &mdash; XYRA CORE</h3>
+          <p>Hospitality POS, ERP and Supply Connect, running ESP's own operations today. Your order, our kitchen schedule and our purchasing sit on one system.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="home-clients fade-in">
+        <SectionHeader
+          label="Who We Serve"
+          title="Trusted by Institutions That Cannot Afford a Late Delivery"
+          description="From everyday workforce meals to institutional programmes and major functions, ESP delivers at the scale each organisation needs."
+        />
+        <div class="client-tags">
+          <span class="client-tag">Hospitals</span>
+          <span class="client-tag">Universities</span>
+          <span class="client-tag">Hotels</span>
+          <span class="client-tag">Enterprise</span>
+          <span class="client-tag">Government</span>
+          <span class="client-tag">Event Organisers</span>
+          <span class="client-tag">Corporate Offices</span>
+          <span class="client-tag">Residential Communities</span>
+        </div>
+        <h3 class="fade-in" style="margin-top: var(--space-3xl); text-align: center; color: var(--color-accent);">Some of Our Clients</h3>
+        <div class="client-logos">
+          {clients.map((client) => (
+            <div class="client-logo">
+              <img src={client.image} alt={client.name} loading="lazy" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CTABanner
+    title="Ready to Feed Your Team?"
+    description="Send us headcount, frequency and the occasions you need covered. We will come back with a menu, a price and a delivery schedule."
+    ctaText="Start an Account"
+    ctaHref="/contact"
+  />
+
+  <Footer />
+</Layout>
+
+<style>
+  .stats-section {
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-3xl) 0;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-lg);
+  }
+  .capabilities-section {
+    background: var(--color-muted);
+  }
+  .capabilities-grid {
+    gap: var(--space-lg);
+  }
+  .capability-card {
+    background: var(--color-surface);
+    padding: var(--space-2xl);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    transition: var(--transition);
+  }
+  .capability-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  }
+  .capability-card__status {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-dark);
+    background: var(--color-accent);
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    margin-bottom: var(--space-md);
+  }
+  .capability-card h3 {
+    margin-bottom: var(--space-sm);
+  }
+  .capability-card p {
+    font-size: 0.95rem;
+  }
+  .home-clients {
+    padding: var(--space-3xl) 0;
+  }
+  .client-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    justify-content: center;
+    margin-top: var(--space-xl);
+  }
+  .client-tag {
+    padding: 0.6rem 1.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 40px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-text);
+    transition: var(--transition);
+  }
+  .client-tag:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  /* Client logo grid: 6 columns, equal-size cards, wraps into rows */
+  .client-logos {
+    display: grid;
+    grid-template-columns: repeat(3, 2fr);
+    gap: var(--space-lg);
+    margin-top: var(--space-3xl);
+  }
+  .client-logo {
+    aspect-ratio: 5 / 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: var(--transition);
+  }
+  .client-logo:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  }
+  .client-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  @media (max-width: 1024px) {
+    .client-logos { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .client-logos { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>

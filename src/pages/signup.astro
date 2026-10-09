@@ -1,0 +1,50 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import AuthForm from '../components/AuthForm.astro';
+
+const requested = Astro.url.searchParams.get('next');
+const next = requested && requested.startsWith('/') && !requested.startsWith('//') ? requested : '';
+
+if (Astro.locals.user) {
+  return Astro.redirect(next || (Astro.locals.user.role === 'admin' ? '/admin' : '/cafe'), 302);
+}
+---
+
+<Layout title="Create an Account">
+  <Header />
+
+  <div class="page-header">
+    <div class="container">
+      <span class="label">Get Started</span>
+      <h1>Create an Account</h1>
+      <p>One account for Stone &amp; Pebble Cafe orders, Indulge desserts and corporate programmes.</p>
+    </div>
+  </div>
+
+  <section>
+    <div class="container container--narrow">
+      <div class="auth-card fade-in">
+        <AuthForm mode="signup" next={next} />
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</Layout>
+
+<style>
+  .auth-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3xl);
+    max-width: 480px;
+    margin: 0 auto;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+  }
+  section {
+    padding: var(--space-4xl) 0;
+  }
+</style>

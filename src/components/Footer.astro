@@ -1,0 +1,124 @@
+﻿---
+---
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <div class="footer__logo">
+          <img src="/images/logofoot.png" alt="Earth Stone & Pebble Logo" class="footer__logo-mark" />
+          <span class="footer__logo-text">Earth Stone &amp; Pebble Corp.</span>
+        </div>
+        <p class="footer__tagline">Global Quality. Local Soul.</p>
+        <p class="footer__desc">Corporate food, hospitality and technology — built in Cebu, serving Metro Cebu and beyond.</p>
+      </div>
+      <div class="footer__col">
+        <h4 class="footer__heading">Services</h4>
+        <a href="/services" class="footer__link">Corporate Food</a>
+        <a href="/events" class="footer__link">Events &amp; Catering</a>
+        <a href="/cafe" class="footer__link">Stone &amp; Pebble Cafe</a>
+        <a href="/indulge" class="footer__link">Indulge Desserts</a>
+      </div>
+      <div class="footer__col">
+        <h4 class="footer__heading">Company</h4>
+        <a href="/about" class="footer__link">About Us</a>
+        <a href="/ordering" class="footer__link">How to Order</a>
+        <a href="/contact" class="footer__link">Start an Account</a>
+      </div>
+      <div class="footer__col">
+        <h4 class="footer__heading">Contact</h4>
+        <a href="mailto:stoneandpebblecafe@gmail.com" class="footer__link">stoneandpebblecafe@gmail.com</a>
+        <a href="tel:+6309459875573" class="footer__link">+63 0945 987 5573</a>
+        <a href="tel:+6309566184206" class="footer__link">+63 0956 618 4206</a>
+        <a href="https://cebufoodtrays.com" class="footer__link" target="_blank">cebufoodtrays.com</a>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <p>&copy; 2026 Earth Stone &amp; Pebble Corp. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--color-primary);
+    color: var(--color-warm-white);
+    padding: var(--space-4xl) 0 var(--space-xl);
+  }
+  .footer__grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: var(--space-3xl);
+  }
+  .footer__logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: var(--space-md);
+  }
+  .footer__logo-mark {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    display: block;
+  }
+  .footer__logo-text {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .footer__tagline {
+    color: var(--color-accent);
+    font-weight: 500;
+    margin-bottom: var(--space-md);
+    font-size: 0.95rem;
+  }
+  .footer__desc {
+    color: rgba(250, 246, 239, 0.6);
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+  .footer__heading {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(250, 246, 239, 0.4);
+    margin-bottom: var(--space-lg);
+  }
+  .footer__col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  .footer__link {
+    color: rgba(250, 246, 239, 0.7);
+    font-size: 0.875rem;
+    transition: var(--transition);
+  }
+  .footer__link:hover {
+    color: var(--color-warm-white);
+  }
+  .footer__bottom {
+    margin-top: var(--space-3xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid rgba(250, 246, 239, 0.1);
+    text-align: center;
+  }
+  .footer__bottom p {
+    color: rgba(250, 246, 239, 0.4);
+    font-size: 0.8rem;
+  }
+  @media (max-width: 768px) {
+    .footer__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+    }
+    .footer__brand {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 480px) {
+    .footer__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

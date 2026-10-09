@@ -1,0 +1,187 @@
+﻿---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import CTABanner from '../components/CTABanner.astro';
+---
+<Layout title="Events & Catering">
+  <Header />
+
+  <div class="page-header">
+    <div class="container">
+      <span class="label">S&amp;P Catering &amp; Events</span>
+      <h1>Events, Produced End to End</h1>
+      <p>From the first brief to the final guest, we coordinate the environment, hospitality and service behind corporate meetings, launches and company functions.</p>
+    </div>
+  </div>
+
+  <section>
+    <div class="container">
+      <SectionHeader
+        label="One Accountable Partner"
+        title="From Brief to Applause"
+        description="Food is part of the experience; our role is to bring the whole occasion together."
+      />
+      <div class="event-process">
+        <div class="event-step fade-in">
+          <div class="event-step__icon">
+            <span>01</span>
+          </div>
+          <div class="event-step__content">
+            <h3>Shape the Occasion</h3>
+            <p class="event-step__label">Event Planning</p>
+            <p>Format, run sheet, guest flow and coordination built around the event objective.</p>
+          </div>
+        </div>
+        <div class="event-step fade-in">
+          <div class="event-step__icon">
+            <span>02</span>
+          </div>
+          <div class="event-step__content">
+            <h3>Prepare the Room</h3>
+            <p class="event-step__label">Setup &amp; Production</p>
+            <p>Venue layout, presentation area, tables, styling and event-ready details.</p>
+          </div>
+        </div>
+        <div class="event-step fade-in">
+          <div class="event-step__icon">
+            <span>03</span>
+          </div>
+          <div class="event-step__content">
+            <h3>Curate the Menu</h3>
+            <p class="event-step__label">Food &amp; Beverage</p>
+            <p>Menus and formats selected to suit the schedule, audience and style of occasion.</p>
+          </div>
+        </div>
+        <div class="event-step fade-in">
+          <div class="event-step__icon">
+            <span>04</span>
+          </div>
+          <div class="event-step__content">
+            <h3>Host with Confidence</h3>
+            <p class="event-step__label">On-Site Service</p>
+            <p>Professional hospitality, guest attention and coordinated delivery throughout.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="event-types">
+    <div class="container">
+      <SectionHeader
+        label="Events We Produce"
+        title="Meetings, Launches, Company Functions"
+        description="Whatever the format, we bring the same dependable production and hospitality."
+        center
+      />
+      <div class="types-grid">
+        <div class="type-card fade-in">
+          <h3>Corporate Meetings</h3>
+          <p>Board meetings, team offsites, strategy sessions — with food that matches the agenda.</p>
+        </div>
+        <div class="type-card fade-in">
+          <h3>Product Launches</h3>
+          <p>Make the reveal memorable with coordinated catering, setup and on-site service.</p>
+        </div>
+        <div class="type-card fade-in">
+          <h3>Company Functions</h3>
+          <p>Annual gatherings, holiday celebrations and team milestones catered end to end.</p>
+        </div>
+        <div class="type-card fade-in">
+          <h3>Conferences</h3>
+          <p>Multi-session events with scheduled meal service, refreshments and breaks.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CTABanner
+    title="Planning an Event?"
+    description="Tell us the occasion, the headcount and the vision. We will take it from there."
+    ctaText="Inquire Now"
+    ctaHref="/contact"
+  />
+
+  <Footer />
+</Layout>
+
+<style>
+  .event-process {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .event-step {
+    display: flex;
+    gap: var(--space-xl);
+    padding: var(--space-2xl);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: var(--transition);
+  }
+  .event-step:hover {
+    border-color: var(--color-accent);
+    transform: translateX(4px);
+  }
+  .event-step__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    background: var(--color-primary);
+    border-radius: var(--radius-md);
+  }
+  .event-step__icon span {
+    color: var(--color-accent);
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .event-step__label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: var(--space-sm);
+  }
+  .event-step h3 {
+    margin-bottom: var(--space-xs);
+  }
+  .event-types {
+    background: var(--color-muted);
+  }
+  .types-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-lg);
+  }
+  .type-card {
+    background: var(--color-surface);
+    padding: var(--space-2xl);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    transition: var(--transition);
+  }
+  .type-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  }
+  .type-card h3 {
+    margin-bottom: var(--space-sm);
+  }
+  .type-card p {
+    font-size: 0.95rem;
+  }
+  @media (max-width: 768px) {
+    .types-grid { grid-template-columns: 1fr; }
+    .event-step { flex-direction: column; gap: var(--space-md); }
+  }
+</style>

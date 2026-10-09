@@ -1,0 +1,172 @@
+﻿---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import CTABanner from '../components/CTABanner.astro';
+---
+<Layout title="About Us">
+  <Header />
+
+  <div class="page-header">
+    <div class="container">
+      <span class="label">About ESP</span>
+      <h1>Who We Are</h1>
+      <p>One group, shared kitchens and systems. Earth Stone & Pebble develops food and hospitality businesses through shared commercial and operational capabilities.</p>
+    </div>
+  </div>
+
+  <section>
+    <div class="container">
+      <div class="story-grid">
+        <div class="story-content fade-in">
+          <SectionHeader
+            label="Our Story"
+            title="From Idea to Operation"
+            description="Built between two markets."
+          />
+          <p class="story-text">Earth Stone & Pebble began with a simple commercial belief: food and hospitality businesses can be locally relevant without compromising operating discipline, design quality or customer experience. That belief travelled from Australia to Cebu, where it became a working business.</p>
+        </div>
+        <div class="story-timeline fade-in">
+          <div class="timeline-item">
+            <span class="timeline-number">01</span>
+            <div>
+              <h3>Australia &mdash; The Standard</h3>
+              <p>International customer expectations, commercial discipline and a global-quality mindset shaped the benchmark.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <span class="timeline-number">02</span>
+            <div>
+              <h3>Cebu &mdash; The Foundation</h3>
+              <p>Earth Stone &amp; Pebble was established in 2024. Stone &amp; Pebble Cafe opened at Base Line Centre in 2025.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <span class="timeline-number">03</span>
+            <div>
+              <h3>Today &mdash; A Working Operation</h3>
+              <p>Hospitality, corporate food services, CebuFoodTrays.com and XYRA CORE brought together under one operating model.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mission-section">
+    <div class="container">
+      <div class="mission-grid">
+        <div class="mission-card fade-in">
+          <span class="label">Our Mission</span>
+          <h3>Build trusted food, hospitality and technology businesses that combine international standards with local understanding.</h3>
+        </div>
+        <div class="mission-card fade-in">
+          <span class="label">Brand Promise</span>
+          <h3>Global Quality. Local Soul.</h3>
+          <p>Polished but personal. Scalable but locally relevant. Commercially disciplined without losing warmth.</p>
+        </div>
+        <div class="mission-card fade-in">
+          <span class="label">In Practice</span>
+          <h3>One set of recipes, service standards and quality checks, applied whether the order is a table for two or 300 packed meals.</h3>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <SectionHeader
+        label="What That Means"
+        title="Who We Answer To"
+        description="Customers, corporate clients, partners and the communities the group employs and buys from."
+        center
+      />
+    </div>
+  </section>
+
+  <CTABanner
+    title="Want to Know More?"
+    description="Get in touch with our team to learn how ESP can serve your organisation."
+    ctaText="Contact Us"
+    ctaHref="/contact"
+  />
+
+  <Footer />
+</Layout>
+
+<style>
+  .story-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4xl);
+    align-items: start;
+  }
+  .story-text {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    margin-top: var(--space-lg);
+  }
+  .story-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+  .timeline-item {
+    display: flex;
+    gap: var(--space-lg);
+    padding: var(--space-xl);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: var(--transition);
+  }
+  .timeline-item:hover {
+    border-color: var(--color-accent);
+  }
+  .timeline-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    background: var(--color-muted);
+    color: var(--color-accent);
+    font-weight: 700;
+    font-size: 0.85rem;
+    border-radius: var(--radius-sm);
+  }
+  .timeline-item h3 {
+    margin-bottom: var(--space-xs);
+    font-size: 1.1rem;
+  }
+  .timeline-item p {
+    font-size: 0.9rem;
+  }
+  .mission-section {
+    background: var(--color-muted);
+  }
+  .mission-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+  }
+  .mission-card {
+    background: var(--color-surface);
+    padding: var(--space-2xl);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+  }
+  .mission-card h3 {
+    font-size: 1.15rem;
+    line-height: 1.5;
+  }
+  .mission-card p {
+    font-size: 0.95rem;
+  }
+  @media (max-width: 768px) {
+    .story-grid { grid-template-columns: 1fr; gap: var(--space-2xl); }
+    .mission-grid { grid-template-columns: 1fr; }
+  }
+</style>

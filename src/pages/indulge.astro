@@ -1,0 +1,91 @@
+﻿---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import CTABanner from '../components/CTABanner.astro';
+import MenuBrowser from '../components/MenuBrowser.astro';
+import { getMenu } from '../lib/menu';
+
+const requested = Astro.url.searchParams.get('category')?.trim() || '';
+const initialCategories = getMenu('indulge').categories;
+const match = requested
+  ? initialCategories.find((category) => category.name.toLowerCase() === requested.toLowerCase())
+  : undefined;
+const activeCategory = match ? match.name : null;
+const { categories, items } = getMenu('indulge', activeCategory);
+---
+<Layout title="Indulge Desserts">
+  <Header />
+
+  <div class="page-header">
+    <div class="container">
+      <span class="label">Full-Service Desserts</span>
+      <h1>Indulge by Stone &amp; Pebble</h1>
+      <p>ESP's full-service dessert brand — handcrafted ice cream, signature sundaes, warm waffles, crepes, cakes and dessert drinks, available on the same corporate account.</p>
+    </div>
+  </div>
+
+  <section id="menu">
+    <div class="container">
+      <SectionHeader
+        label="Our Menu"
+        title="Every Craving Has a Place"
+        description="Ice cream, waffles, crepes, cakes and dessert drinks under one curated identity. Pick a category below to see what is on the menu today."
+      />
+      <MenuBrowser brand="indulge" categories={categories} items={items} activeCategory={activeCategory} allLabel="All Indulge Items" />
+    </div>
+  </section>
+
+  <section class="indulge-use-cases">
+    <div class="container">
+      <div class="use-case-grid">
+        <div class="use-case fade-in">
+          <span class="label">Why It Matters to You</span>
+          <h3>From Spontaneous to Celebratory</h3>
+          <p>Corporate gifting, client hampers, birthdays, team milestones and event dessert stations. Indulge adapts to every occasion.</p>
+        </div>
+        <div class="use-case fade-in">
+          <span class="label">How It Flexes</span>
+          <h3>Designed to Flex by Format</h3>
+          <p>Dessert bars, compact kiosks, cafe counters, delivery and on-site event activations. One brand, multiple formats.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CTABanner
+    title="Add Indulge to Your Next Event"
+    description="Dessert stations, corporate hampers and celebrations — all on your ESP account."
+    ctaText="Inquire Now"
+    ctaHref="/contact"
+  />
+
+  <Footer />
+</Layout>
+
+<style>
+  .indulge-use-cases {
+    background: var(--color-muted);
+  }
+  .use-case-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-xl);
+  }
+  .use-case {
+    background: var(--color-surface);
+    padding: var(--space-2xl);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+  }
+  .use-case h3 {
+    margin-bottom: var(--space-md);
+  }
+  .use-case p {
+    font-size: 0.95rem;
+  }
+  @media (max-width: 768px) {
+    .use-case-grid { grid-template-columns: 1fr; }
+  }
+</style>

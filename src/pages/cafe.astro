@@ -1,0 +1,202 @@
+﻿---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import CTABanner from '../components/CTABanner.astro';
+import MenuBrowser from '../components/MenuBrowser.astro';
+import { getMenu } from '../lib/menu';
+
+const requested = Astro.url.searchParams.get('category')?.trim() || '';
+const initialCategories = getMenu('cafe').categories;
+const match = requested
+  ? initialCategories.find((category) => category.name.toLowerCase() === requested.toLowerCase())
+  : undefined;
+const activeCategory = match ? match.name : null;
+const { categories, items } = getMenu('cafe', activeCategory);
+---
+<Layout title="Stone & Pebble Cafe">
+  <Header />
+
+  <div class="page-header">
+    <div class="container">
+      <span class="label label--light">The Flagship Kitchen</span>
+      <h1>Stone &amp; Pebble Cafe</h1>
+      <p>A premium cafe-restaurant at Base Line Centre, bringing specialty coffee, globally inspired food and Filipino hospitality together in one all-day destination.</p>
+    </div>
+  </div>
+
+  <section>
+    <div class="container">
+      <div class="cafe-info-grid">
+        <div class="cafe-info fade-in">
+          <span class="label">Location</span>
+          <h3>Base Line Center, Capitol Site, Cebu City</h3>
+        </div>
+        <div class="cafe-info fade-in">
+          <span class="label">Hours</span>
+          <h3>8am &ndash; 11pm, Daily</h3>
+        </div>
+        <div class="cafe-info fade-in">
+          <span class="label">Opened</span>
+          <h3>2025</h3>
+        </div>
+        <div class="cafe-info fade-in">
+          <span class="label">Format</span>
+          <h3>Dine-in, Takeaway &amp; Delivery</h3>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="menu">
+    <div class="container">
+      <SectionHeader
+        label="Our Menu"
+        title="What to Order"
+        description="From sunrise to evening, every dish is crafted in-house. Pick a category below to see what is on the menu today."
+      />
+      <MenuBrowser brand="cafe" categories={categories} items={items} activeCategory={activeCategory} allLabel="All Cafe Items" />
+    </div>
+  </section>
+
+  <section class="cafe-highlight">
+    <div class="container">
+      <div class="highlight-grid">
+        <div class="highlight-content fade-in">
+          <span class="label">The Kitchen Behind the Contract</span>
+          <h2>Where Recipes Are Born</h2>
+          <p>Stone &amp; Pebble Cafe is more than a dining destination. It is where ESP develops the recipes, service standards and quality control that the corporate kitchens run on. Every dish served in our cafe is the same dish delivered to your office.</p>
+          <div class="divider"></div>
+          <a href="/services" class="btn btn--accent">View Corporate Services</a>
+        </div>
+        <div class="highlight-stats fade-in">
+          <div class="highlight-stat">
+            <span class="highlight-stat__number">2025</span>
+            <span class="highlight-stat__label">Established</span>
+          </div>
+          <div class="highlight-stat">
+            <span class="highlight-stat__number">15hrs</span>
+            <span class="highlight-stat__label">Daily Operations</span>
+          </div>
+          <div class="highlight-stat">
+            <span class="highlight-stat__number">100+</span>
+            <span class="highlight-stat__label">Menu Items Tested</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cafe-tagline">
+    <div class="container text-center">
+      <h2 class="cafe-tagline__text">Coffee &middot; Dining &middot; Connection</h2>
+      <p class="cafe-tagline__sub">A destination made for connection. Base Line Centre, Cebu City.</p>
+    </div>
+  </section>
+
+  <CTABanner
+    title="Visit Stone & Pebble Cafe"
+    description="Base Line Centre, Cebu City. Open daily from 8am to 11pm."
+    ctaText="Start an Account"
+    ctaHref="/contact"
+  />
+
+  <Footer />
+</Layout>
+<script>//scroll to menu if category is clicked
+  if (new URLSearchParams(window.location.search).has('category')) {
+    document.getElementById('menu')?.scrollIntoView();
+  }
+</script>
+<style>
+  .label--light { color: var(--color-sky); }
+  .cafe-info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-lg);
+    padding: var(--space-2xl) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .cafe-info {
+    text-align: center;
+    padding: var(--space-lg);
+  }
+  .cafe-info h3 { font-size: 1.1rem; }
+
+  .cafe-highlight {
+    background: var(--color-dark);
+    color: #fff;
+  }
+  .highlight-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: var(--space-4xl);
+    align-items: center;
+  }
+  .highlight-content h2 {
+    color: #fff;
+    margin-bottom: var(--space-lg);
+  }
+  .highlight-content p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.05rem;
+  }
+  .highlight-content .divider {
+    background: var(--color-sky);
+  }
+  .highlight-stats {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+  .highlight-stat {
+    padding: var(--space-xl);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    text-align: center;
+  }
+  .highlight-stat__number {
+    display: block;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-sky);
+    margin-bottom: var(--space-xs);
+  }
+  .highlight-stat__label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  #menu {
+  scroll-margin-top: 72px;
+  }
+  .cafe-tagline {
+  padding: var(--space-4xl) 0;
+  background:
+    linear-gradient(rgba(20, 18, 16, 0.72), rgba(20, 18, 16, 0.72)),
+    url('/images/cafe_bg.jpg') center / cover no-repeat;
+  background-attachment: fixed;
+}
+.cafe-tagline__text {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  color: var(--color-warm-white);
+  margin-bottom: var(--space-md);
+}
+.cafe-tagline__sub {
+  font-size: 1.1rem;
+  color: var(--color-gold);
+}
+
+  @media (max-width: 768px) {
+    .cafe-info-grid { grid-template-columns: repeat(2, 1fr); }
+    .highlight-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .cafe-info-grid { grid-template-columns: 1fr; }
+  }
+</style>

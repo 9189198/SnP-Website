@@ -1,0 +1,209 @@
+﻿---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+---
+<Layout title="Start an Account">
+  <Header />
+
+  <div class="page-header">
+    <div class="container">
+      <span class="label">Next Step</span>
+      <h1>Start an Account</h1>
+      <p>Tell us how your team eats. We will come back with a menu, a price and a delivery schedule.</p>
+    </div>
+  </div>
+
+  <section>
+    <div class="container">
+      <div class="contact-grid">
+        <div class="contact-channels fade-in">
+          <SectionHeader
+            label="Three Ways to Reach Us"
+            title="Get in Touch"
+          />
+          <div class="channel-list">
+            <div class="channel-item">
+              <div class="channel-item__icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+              </div>
+              <div>
+                <h3>Corporate Ordering</h3>
+                <a href="https://cebufoodtrays.com" target="_blank">cebufoodtrays.com</a>
+                <p>Packed meals, trays and catering. Two-day lead time on bulk deliveries.</p>
+              </div>
+            </div>
+            <div class="channel-item">
+              <div class="channel-item__icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <div>
+                <h3>Accounts &amp; Programmes</h3>
+                <a href="mailto:stoneandpebblecafe@gmail.com">stoneandpebblecafe@gmail.com</a>
+                <a href="tel:+6309459875573">+63 0945 987 5573</a>
+                <a href="tel:+6309566184206">+63 0956 618 4206</a>
+                <p>Recurring meal programmes, institutional contracts and event enquiries.</p>
+              </div>
+            </div>
+            <div class="channel-item">
+              <div class="channel-item__icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              </div>
+              <div>
+                <h3>Direct Delivery</h3>
+                <a href="https://snpeats.com" target="_blank">snpeats.com</a>
+                <p>Smaller orders, same-day requests, desserts and drinks.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-form-wrapper fade-in">
+          <SectionHeader
+            label="Quick Inquiry"
+            title="Send Us a Message"
+          />
+          <form class="contact-form" id="contact-form">
+            <div class="form-group">
+              <label for="name">Your Name</label>
+              <input type="text" id="name" name="name" required />
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" name="email" required />
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phone" name="phone" />
+            </div>
+            <div class="form-group">
+              <label for="company">Company / Organisation</label>
+              <input type="text" id="company" name="company" />
+            </div>
+            <div class="form-group">
+              <label for="service">Service Interested In</label>
+              <select id="service" name="service">
+                <option value="">Select a service</option>
+                <option value="packed-meals">Packed Meals</option>
+                <option value="food-trays">Food Trays</option>
+                <option value="catering">Catering</option>
+                <option value="events">Events</option>
+                <option value="indulge">Indulge Desserts</option>
+                <option value="account">Standing Account</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="message">Tell Us About Your Needs</label>
+              <textarea id="message" name="message" rows="4" placeholder="Headcount, frequency, occasions..."></textarea>
+            </div>
+            <button type="submit" class="btn btn--primary btn--full">Send Inquiry</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</Layout>
+
+<style>
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4xl);
+    align-items: start;
+  }
+  .channel-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    margin-top: var(--space-xl);
+  }
+  .channel-item {
+    display: flex;
+    gap: var(--space-lg);
+    padding: var(--space-xl);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: var(--transition);
+  }
+  .channel-item:hover {
+    border-color: var(--color-accent);
+  }
+  .channel-item__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    background: var(--color-muted);
+    border-radius: var(--radius-md);
+    color: var(--color-accent);
+  }
+  .channel-item h3 {
+    margin-bottom: var(--space-xs);
+    font-size: 1rem;
+  }
+  .channel-item a {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--color-accent);
+    font-weight: 500;
+    margin-bottom: var(--space-xs);
+  }
+  .channel-item a:hover {
+    color: var(--color-accent-dark);
+  }
+  .channel-item p {
+    font-size: 0.85rem;
+    margin-top: var(--space-sm);
+  }
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    margin-top: var(--space-xl);
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  .form-group label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    color: var(--color-text);
+    background: var(--color-surface);
+    transition: var(--transition);
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+  }
+  .form-group textarea {
+    resize: vertical;
+  }
+  .btn--full {
+    width: 100%;
+    justify-content: center;
+    padding: var(--space-md) var(--space-xl);
+  }
+  @media (max-width: 768px) {
+    .contact-grid { grid-template-columns: 1fr; }
+  }
+</style>

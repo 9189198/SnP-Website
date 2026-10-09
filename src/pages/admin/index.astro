@@ -1,0 +1,798 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { getMenu, listAllCategories } from '../../lib/menu';
+
+const user = Astro.locals.user;
+const initialBrand = Astro.url.searchParams.get('menu') === 'indulge' ? 'indulge' : 'cafe';
+
+const initial = {
+  brand: initialBrand,
+  items: getMenu(initialBrand, null, true).items,
+  categories: {
+    cafe: listAllCategories('cafe'),
+    indulge: listAllCategories('indulge'),
+  },
+};
+const initialJson = JSON.stringify(initial).replace(/</g, '\\u003c');
+---
+
+<Layout title="Menu Management">
+  <Header />
+
+  <div class="page-header">
+    <div class="container">
+      <span class="label">Administration</span>
+      <h1>Menu Management</h1>
+      <p>Signed in as {user?.email}. Changes here go straight to the live {initialBrand === 'cafe' ? 'Cafe' : 'Indulge'} menu.</p>
+    </div>
+  </div>
+
+  <section>
+    <div class="container">
+      <div class="admin-app" id="admin-app" data-brand={initialBrand} data-user={user?.email ?? ''}>
+        <script type="application/json" id="admin-initial" set:html={initialJson} is:inline></script>
+
+        <div class="admin-bar">
+          <div class="admin-tabs" role="tablist" aria-label="Menu">
+            <button type="button" class="admin-tab" data-brand-tab="cafe" role="tab" aria-selected="true">Stone &amp; Pebble Cafe</button>
+            <button type="button" class="admin-tab" data-brand-tab="indulge" role="tab" aria-selected="false">Indulge</button>
+          </div>
+          <div class="admin-bar__actions">
+            <a class="btn btn--outline btn--sm" data-view-link href="/cafe" target="_blank" rel="noopener">View live menu</a>
+            <button type="button" class="btn btn--outline btn--sm" id="sign-out">Sign out</button>
+          </div>
+        </div>
+
+        <p class="admin-alert" data-alert role="alert" hidden></p>
+
+        <div class="admin-grid">
+          <section class="admin-list-card">
+            <div class="admin-list-head">
+              <h2 data-list-title>Cafe Menu Items</h2>
+              <p data-list-meta>Loading…</p>
+            </div>
+            <div class="admin-items" data-items>
+              <p class="admin-placeholder">Loading menu items from the database…</p>
+            </div>
+          </section>
+
+          <aside class="admin-form-card">
+            <h2 data-form-title>Add Menu Item</h2>
+            <form class="admin-form" id="item-form" enctype="multipart/form-data">
+              <div class="admin-form__row admin-form__row--2">
+                <div class="form-group">
+                  <label for="item-brand">Menu</label>
+                  <select id="item-brand" name="brand">
+                    <option value="cafe">Stone &amp; Pebble Cafe</option>
+                    <option value="indulge">Indulge</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="item-category">Type / Category</label>
+                  <input
+                    type="text"
+                    id="item-category"
+                    name="category"
+                    list="category-options"
+                    placeholder="Main Course"
+                    required
+                  />
+                  <datalist id="category-options"></datalist>
+                  <p class="field-hint">Pick an existing category or type a new one.</p>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="item-name">Item Name</label>
+                <input type="text" id="item-name" name="name" placeholder="Pepper Beef Steak" required />
+                <p class="field-error" data-error-for="name" hidden></p>
+              </div>
+
+              <div class="form-group">
+                <label for="item-description">Description</label>
+                <textarea id="item-description" name="description" rows="3" placeholder="Grilled beef medallion in a cracked pepper sauce…"></textarea>
+                <p class="field-error" data-error-for="description" hidden></p>
+              </div>
+
+              <div class="form-group">
+                <label for="item-price">Price (PHP)</label>
+                <input type="number" id="item-price" name="price" min="0" step="0.01" inputmode="decimal" placeholder="285.00" required />
+                <p class="field-error" data-error-for="price" hidden></p>
+              </div>
+
+              <div class="form-group">
+                <label for="item-image">Item Picture</label>
+                <input type="file" id="item-image" name="image" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" />
+                <p class="field-hint">JPG, PNG, WEBP, GIF or AVIF. Up to 5MB.</p>
+                <p class="field-error" data-error-for="image" hidden></p>
+                <input type="hidden" name="image_url" data-image-url value="" />
+                <div class="image-preview" data-preview-wrap hidden>
+                  <img data-preview src="" alt="Selected item picture" />
+                  <label class="image-preview__remove">
+                    <input type="checkbox" name="clear_image" data-clear-image value="true" />
+                    Remove picture
+                  </label>
+                </div>
+              </div>
+
+              <label class="admin-check">
+                <input type="checkbox" id="item-available" name="is_available" data-available checked />
+                <span>Available on the customer menu</span>
+              </label>
+
+              <div class="admin-form__actions">
+                <button type="submit" class="btn btn--primary" data-submit>Save Item</button>
+                <button type="button" class="btn btn--outline" data-cancel hidden>Cancel edit</button>
+              </div>
+            </form>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</Layout>
+
+<script>
+  interface AdminMenuItem {
+    id: number;
+    brand: string;
+    category: string;
+    name: string;
+    description: string;
+    price: number;
+    image_url: string | null;
+    is_available: boolean;
+  }
+
+  interface AdminMenuResponse {
+    ok: boolean;
+    error?: string;
+    errors?: Record<string, string>;
+    item?: AdminMenuItem;
+    deleted?: number;
+    items?: AdminMenuItem[];
+    allCategories?: string[];
+  }
+
+  const need = <T extends Element>(scope: ParentNode, selector: string): T => {
+    const element = scope.querySelector<T>(selector);
+    if (!element) throw new Error(`Missing required element: ${selector}`);
+    return element;
+  };
+
+  const root = document.getElementById('admin-app');
+
+  if (root) {
+    const form = document.getElementById('item-form') as HTMLFormElement;
+    const alertBox = root.querySelector<HTMLElement>('[data-alert]');
+    const itemsContainer = root.querySelector<HTMLElement>('[data-items]');
+    const listTitle = root.querySelector<HTMLElement>('[data-list-title]');
+    const listMeta = root.querySelector<HTMLElement>('[data-list-meta]');
+    const formTitle = root.querySelector<HTMLElement>('[data-form-title]');
+    const submitButton = need<HTMLButtonElement>(form, '[data-submit]');
+    const cancelButton = need<HTMLButtonElement>(form, '[data-cancel]');
+    const imageInput = need<HTMLInputElement>(form, '#item-image');
+    const imageUrlField = need<HTMLInputElement>(form, '[data-image-url]');
+    const clearImageBox = need<HTMLInputElement>(form, '[data-clear-image]');
+    const previewWrap = need<HTMLElement>(form, '[data-preview-wrap]');
+    const previewImage = need<HTMLImageElement>(form, '[data-preview]');
+    const categoryInput = need<HTMLInputElement>(form, '#item-category');
+    const categoryOptions = need<HTMLDataListElement>(form, '#category-options');
+    const brandSelect = need<HTMLSelectElement>(form, '#item-brand');
+    const availableBox = need<HTMLInputElement>(form, '[data-available]');
+    const viewLink = root.querySelector<HTMLAnchorElement>('[data-view-link]');
+    const nameInput = need<HTMLInputElement>(form, '#item-name');
+    const descriptionInput = need<HTMLTextAreaElement>(form, '#item-description');
+    const priceInput = need<HTMLInputElement>(form, '#item-price');
+
+    const initial = JSON.parse(
+      document.getElementById('admin-initial')?.textContent ||
+        '{"brand":"cafe","items":[],"categories":{"cafe":[],"indulge":[]}}',
+    ) as { brand: string; items: AdminMenuItem[]; categories: Record<string, string[]> };
+
+    const state = {
+      brand: root.getAttribute('data-brand') === 'indulge' ? 'indulge' : 'cafe',
+      categories: initial.categories,
+      items: initial.items,
+      editingId: null as number | null,
+    };
+
+    const currency = new Intl.NumberFormat('en-PH', {
+      style: 'currency',
+      currency: 'PHP',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+    const showAlert = (message: string, tone = 'error') => {
+      if (!alertBox) return;
+      alertBox.textContent = message;
+      alertBox.hidden = !message;
+      alertBox.setAttribute('data-tone', tone);
+    };
+
+    const clearFieldErrors = () => {
+      form.querySelectorAll<HTMLElement>('[data-error-for]').forEach((node) => {
+        node.hidden = true;
+        node.textContent = '';
+      });
+      form.querySelectorAll('.invalid').forEach((node) => node.classList.remove('invalid'));
+    };
+
+    const applyFieldErrors = (errors: Record<string, string> = {}) => {
+      Object.entries(errors).forEach(([field, message]) => {
+        const node = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`);
+        if (node) {
+          node.textContent = message;
+          node.hidden = false;
+        }
+        const input = form.querySelector(`[name="${field}"]`);
+        if (input) input.classList.add('invalid');
+      });
+    };
+
+    const setPreview = (url: string) => {
+      if (!previewWrap || !previewImage) return;
+      if (url) {
+        previewImage.src = url;
+        previewWrap.hidden = false;
+      } else {
+        previewImage.removeAttribute('src');
+        previewWrap.hidden = true;
+      }
+    };
+
+    const fillCategoryOptions = (brand: string) => {
+      if (!categoryOptions) return;
+      categoryOptions.replaceChildren(
+        ...(state.categories[brand] || []).map((name) => {
+          const option = document.createElement('option');
+          option.value = name;
+          return option;
+        }),
+      );
+    };
+
+    const itemRow = (item: AdminMenuItem) => {
+      const row = document.createElement('article');
+      row.className = 'admin-item';
+      row.setAttribute('data-item-id', String(item.id));
+
+      const media = document.createElement('div');
+      media.className = 'admin-item__media';
+      if (item.image_url) {
+        const img = document.createElement('img');
+        img.src = item.image_url;
+        img.alt = item.name;
+        img.loading = 'lazy';
+        media.appendChild(img);
+      } else {
+        const placeholder = document.createElement('span');
+        placeholder.className = 'admin-item__placeholder';
+        media.appendChild(placeholder);
+      }
+
+      const body = document.createElement('div');
+      body.className = 'admin-item__body';
+
+      const title = document.createElement('h3');
+      title.className = 'admin-item__name';
+      title.textContent = item.name;
+
+      const meta = document.createElement('p');
+      meta.className = 'admin-item__meta';
+      meta.textContent = item.category;
+
+      const price = document.createElement('p');
+      price.className = 'admin-item__price';
+      price.textContent = currency.format(Number(item.price));
+
+      body.append(title, meta, price);
+
+      const side = document.createElement('div');
+      side.className = 'admin-item__side';
+
+      const badge = document.createElement('span');
+      badge.className = item.is_available ? 'status-badge status-badge--live' : 'status-badge status-badge--off';
+      badge.textContent = item.is_available ? 'Live' : 'Hidden';
+      side.appendChild(badge);
+
+      const actions = document.createElement('div');
+      actions.className = 'admin-item__actions';
+
+      const edit = document.createElement('button');
+      edit.type = 'button';
+      edit.className = 'btn btn--outline btn--sm';
+      edit.textContent = 'Edit';
+      edit.addEventListener('click', () => startEdit(item));
+
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'btn btn--outline btn--sm btn--danger';
+      remove.textContent = 'Delete';
+      remove.addEventListener('click', () => removeItem(item));
+
+      actions.append(edit, remove);
+      side.appendChild(actions);
+      row.append(media, body, side);
+      return row;
+    };
+
+    const renderList = () => {
+      const items = state.items;
+      if (listTitle) listTitle.textContent = state.brand === 'cafe' ? 'Cafe Menu Items' : 'Indulge Menu Items';
+      if (listMeta) {
+        const available = items.filter((item) => item.is_available).length;
+        const categories = new Set(items.map((item) => item.category)).size;
+        listMeta.textContent = `${items.length} item${items.length === 1 ? '' : 's'} · ${available} live · ${categories} categor${categories === 1 ? 'y' : 'ies'}`;
+      }
+      if (!itemsContainer) return;
+
+      if (items.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'admin-placeholder';
+        empty.textContent = 'No items yet. Add your first menu item with the form.';
+        itemsContainer.replaceChildren(empty);
+        return;
+      }
+
+      itemsContainer.replaceChildren(...items.map(itemRow));
+    };
+
+    const refresh = async () => {
+      try {
+        const response = await fetch(`/api/menu?brand=${state.brand}&includeUnavailable=1`);
+        if (!response.ok) throw new Error('Request failed');
+        const data = (await response.json()) as AdminMenuResponse;
+        state.items = data.items || [];
+        state.categories = { ...state.categories, [state.brand]: data.allCategories || state.categories[state.brand] || [] };
+        fillCategoryOptions(state.brand);
+        renderList();
+      } catch {
+        showAlert('Could not load the menu items. Please refresh the page.');
+      }
+    };
+
+    const syncTabs = () => {
+      root.querySelectorAll<HTMLElement>('[data-brand-tab]').forEach((tab) => {
+        const active = tab.getAttribute('data-brand-tab') === state.brand;
+        tab.classList.toggle('active', active);
+        tab.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      if (viewLink) {
+        viewLink.setAttribute('href', state.brand === 'cafe' ? '/cafe' : '/indulge');
+      }
+    };
+
+    const resetForm = () => {
+      state.editingId = null;
+      form.reset();
+      brandSelect.value = state.brand;
+      availableBox.checked = true;
+      imageUrlField.value = '';
+      clearImageBox.checked = false;
+      if (formTitle) formTitle.textContent = 'Add Menu Item';
+      submitButton.textContent = 'Save Item';
+      cancelButton.hidden = true;
+      setPreview('');
+      clearFieldErrors();
+    };
+
+    const startEdit = (item: AdminMenuItem) => {
+      state.editingId = item.id;
+      nameInput.value = item.name;
+      categoryInput.value = item.category;
+      descriptionInput.value = item.description || '';
+      priceInput.value = Number(item.price).toFixed(2);
+      brandSelect.value = item.brand;
+      availableBox.checked = Boolean(item.is_available);
+      imageUrlField.value = item.image_url || '';
+      clearImageBox.checked = false;
+      if (formTitle) formTitle.textContent = `Edit “${item.name}”`;
+      submitButton.textContent = 'Update Item';
+      cancelButton.hidden = false;
+      setPreview(item.image_url || '');
+      form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
+    const removeItem = async (item: AdminMenuItem) => {
+      const confirmed = window.confirm(`Delete “${item.name}” from the ${state.brand} menu? This cannot be undone.`);
+      if (!confirmed) return;
+      try {
+        const response = await fetch(`/api/menu/${item.id}`, { method: 'DELETE' });
+        const result = (await response.json().catch(() => ({}))) as AdminMenuResponse;
+        if (!response.ok) {
+          showAlert(result.error || 'Could not delete the item.');
+          return;
+        }
+        if (state.editingId === item.id) resetForm();
+        showAlert(`Deleted “${item.name}”.`, 'success');
+        await refresh();
+      } catch {
+        showAlert('Could not delete the item. Please try again.');
+      }
+    };
+
+    root.querySelectorAll<HTMLElement>('[data-brand-tab]').forEach((tab) => {
+      tab.addEventListener('click', async () => {
+        const brand = tab.getAttribute('data-brand-tab');
+        if (!brand || brand === state.brand) return;
+        state.brand = brand;
+        syncTabs();
+        resetForm();
+        fillCategoryOptions(state.brand);
+        await refresh();
+        const url = new URL(window.location.href);
+        url.searchParams.set('menu', brand);
+        window.history.replaceState({}, '', url);
+      });
+    });
+
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files && imageInput.files[0];
+      if (file) setPreview(URL.createObjectURL(file));
+    });
+
+    clearImageBox.addEventListener('change', () => {
+      if (clearImageBox.checked) setPreview('');
+    });
+
+    brandSelect.addEventListener('change', () => {
+      fillCategoryOptions(brandSelect.value);
+    });
+
+    cancelButton.addEventListener('click', () => {
+      resetForm();
+      showAlert('');
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      clearFieldErrors();
+      showAlert('');
+
+      const formData = new FormData(form);
+      formData.set('is_available', availableBox.checked ? 'true' : 'false');
+      formData.set('clear_image', clearImageBox.checked ? 'true' : 'false');
+      if (clearImageBox.checked) formData.set('image_url', '');
+      if (imageInput.files && imageInput.files[0]) formData.delete('image_url');
+
+      const editing = state.editingId !== null;
+      const endpoint = editing ? `/api/menu/${state.editingId}` : '/api/menu';
+      const label = submitButton.textContent ?? '';
+      submitButton.disabled = true;
+      submitButton.textContent = 'Saving…';
+
+      try {
+        const response = await fetch(endpoint, {
+          method: editing ? 'PATCH' : 'POST',
+          body: formData,
+        });
+        const result = (await response.json().catch(() => ({}))) as AdminMenuResponse;
+
+        if (!response.ok) {
+          showAlert(result.error || 'Could not save the item.');
+          applyFieldErrors(result.errors);
+          submitButton.disabled = false;
+          submitButton.textContent = label;
+          return;
+        }
+
+        if (editing && result.item?.brand && result.item.brand !== state.brand) {
+          state.brand = result.item.brand;
+          syncTabs();
+        }
+        resetForm();
+        showAlert(editing ? 'Menu item updated.' : 'Menu item added.', 'success');
+        await refresh();
+      } catch {
+        showAlert('Could not reach the server. Please try again.');
+        submitButton.disabled = false;
+        submitButton.textContent = label;
+      }
+    });
+
+    document.getElementById('sign-out')?.addEventListener('click', async () => {
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+      } finally {
+        window.location.assign('/login');
+      }
+    });
+
+    brandSelect.value = state.brand;
+    syncTabs();
+    fillCategoryOptions(state.brand);
+    renderList();
+  }
+</script>
+
+<style is:global>
+  .admin-app {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+  .admin-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+  }
+  .admin-tabs {
+    display: inline-flex;
+    gap: var(--space-xs);
+    padding: var(--space-xs);
+    background: var(--color-muted);
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+  }
+  .admin-tab {
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.6rem 1.4rem;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .admin-tab.active {
+    background: var(--color-primary);
+    color: var(--color-warm-white);
+  }
+  .admin-bar__actions {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+  .btn--sm {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+  }
+  .btn--danger {
+    color: #b3402f;
+    border-color: rgba(179, 64, 47, 0.4);
+  }
+  .btn--danger:hover {
+    background: #b3402f;
+    color: #fff;
+  }
+  .admin-alert {
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-md);
+    background: rgba(179, 64, 47, 0.08);
+    border: 1px solid rgba(179, 64, 47, 0.25);
+    color: #b3402f;
+    font-size: 0.9rem;
+  }
+  .admin-alert[data-tone='success'] {
+    background: rgba(201, 162, 75, 0.14);
+    border-color: rgba(201, 162, 75, 0.4);
+    color: var(--color-accent-dark);
+  }
+  .admin-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: var(--space-xl);
+    align-items: start;
+  }
+  .admin-list-card,
+  .admin-form-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+  }
+  .admin-form-card {
+    position: sticky;
+    top: 96px;
+  }
+  .admin-list-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-lg);
+  }
+  .admin-list-head h2,
+  .admin-form-card h2 {
+    font-size: 1.25rem;
+  }
+  .admin-list-head p {
+    font-size: 0.8rem;
+  }
+  .admin-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  .admin-item {
+    display: grid;
+    grid-template-columns: 72px 1fr auto;
+    gap: var(--space-lg);
+    align-items: center;
+    padding: var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+  }
+  .admin-item__media {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-muted);
+  }
+  .admin-item__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .admin-item__placeholder {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--color-muted), var(--color-border));
+  }
+  .admin-item__name {
+    font-size: 1rem;
+    margin-bottom: 2px;
+  }
+  .admin-item__meta {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+  }
+  .admin-item__price {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+  .admin-item__side {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+  .admin-item__actions {
+    display: flex;
+    gap: var(--space-xs);
+  }
+  .status-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .status-badge--live {
+    background: rgba(201, 162, 75, 0.15);
+    color: var(--color-accent-dark);
+  }
+  .status-badge--off {
+    background: var(--color-muted);
+    color: var(--color-text-secondary);
+  }
+  .admin-placeholder {
+    font-size: 0.9rem;
+    padding: var(--space-xl);
+    text-align: center;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+  }
+  .admin-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    margin-top: var(--space-lg);
+  }
+  .admin-form__row--2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+  }
+  .admin-form__row--2 > * {
+    min-width: 0;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  .form-group label {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    min-width: 0;
+    padding: 0.65rem 0.9rem;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    color: var(--color-text);
+    background: var(--color-bg);
+    transition: var(--transition);
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+  }
+  .form-group input[type='file'] {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+  .form-group input.invalid {
+    border-color: #b3402f;
+  }
+  .field-hint {
+    font-size: 0.78rem;
+    color: var(--color-text-secondary);
+  }
+  .field-error {
+    font-size: 0.8rem;
+    color: #b3402f;
+  }
+  .image-preview {
+    margin-top: var(--space-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+  .image-preview img {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+  }
+  .image-preview__remove {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+  }
+  .admin-check {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.875rem;
+    color: var(--color-text);
+    cursor: pointer;
+  }
+  .admin-form__actions {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+  section {
+    padding: var(--space-4xl) 0;
+  }
+  @media (max-width: 1024px) {
+    .admin-grid { grid-template-columns: 1fr; }
+    .admin-form-card { position: static; }
+  }
+  @media (max-width: 600px) {
+    .admin-form__row--2 { grid-template-columns: 1fr; }
+    .admin-item { grid-template-columns: 56px 1fr; }
+    .admin-item__side { grid-column: 1 / -1; justify-content: space-between; }
+  }
+</style>

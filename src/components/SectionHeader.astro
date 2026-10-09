@@ -1,0 +1,32 @@
+﻿---
+interface Props {
+  label?: string;
+  title: string;
+  description?: string;
+  center?: boolean;
+}
+
+const { label, title, description, center = false } = Astro.props;
+---
+<div class:list={['section-header', { 'text-center': center }]}>
+  {label && <span class="label">{label}</span>}
+  <h2 class="section-header__title">{title}</h2>
+  {description && <p class="section-header__desc">{description}</p>}
+  <div class:list={['divider', { 'divider--center': center }]}></div>
+</div>
+
+<style>
+  .section-header {
+    margin-bottom: var(--space-3xl);
+  }
+  .section-header__title {
+    margin-bottom: var(--space-md);
+  }
+  .section-header__desc {
+    font-size: 1.05rem;
+    max-width: 560px;
+  }
+  .text-center .section-header__desc {
+    margin: 0 auto;
+  }
+</style>

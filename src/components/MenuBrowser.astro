@@ -1,0 +1,448 @@
+---
+import type { MenuCategory, MenuItem } from '../lib/menu';
+import { formatPrice } from '../lib/validation';
+
+interface Props {
+  brand: 'cafe' | 'indulge';
+  categories: MenuCategory[];
+  items: MenuItem[];
+  activeCategory?: string | null;
+  allLabel?: string;
+}
+
+const { brand, categories, items, activeCategory = null, allLabel = 'All Items' } = Astro.props;
+const active = activeCategory ?? null;
+const hasCategories = categories.length > 0;
+const imageFor = (category: MenuCategory) => category.image || '/images/sandwich.jpg';
+---
+
+<div class="menu-browser" id="menu-browser" data-brand={brand} data-active={active ?? ''}>
+  {hasCategories && (
+    <div class:list={['menu-categories', { 'product-categories': brand === 'indulge' }]}>
+      <button type="button" class:list={['menu-card', 'category-card', { 'product-card': brand === 'indulge', active: active === null }]} data-category="" aria-pressed={active === null ? 'true' : 'false'}>
+        <span class="category-card__image-wrap">
+          <span class="category-card__image category-card__image--all" aria-hidden="true"></span>
+        </span>
+        <h3>{allLabel}</h3>
+        <p class="category-card__meta">
+          {items.length} {items.length === 1 ? 'item' : 'items'} on the menu
+        </p>
+      </button>
+      {categories.map(category => (
+        <button type="button" class:list={['menu-card', 'category-card', { 'product-card': brand === 'indulge', active: active === category.name }]} data-category={category.name} aria-pressed={active === category.name ? 'true' : 'false'}>
+          <span class="category-card__image-wrap">
+            <img src={imageFor(category)} alt={category.name} class="category-card__image" loading="lazy" />
+          </span>
+          <h3>{category.name}</h3>
+          <p class="category-card__meta">
+            {category.itemCount} {category.itemCount === 1 ? 'item' : 'items'}
+          </p>
+        </button>
+      ))}
+    </div>
+  )}
+
+  <div class="menu-toolbar">
+    <div class="menu-chips" role="tablist" aria-label="Filter by category">
+      <button type="button" class="chip" data-category="" role="tab" aria-selected={active === null ? 'true' : 'false'}>{allLabel}</button>
+      {categories.map(category => (
+        <button type="button" class="chip" data-category={category.name} role="tab" aria-selected={active === category.name ? 'true' : 'false'}>
+          {category.name}
+        </button>
+      ))}
+    </div>
+    <p class="menu-status" data-status aria-live="polite">
+      {active ? `${active} — ${items.length} ${items.length === 1 ? 'item' : 'items'}` : `${allLabel} — ${items.length} ${items.length === 1 ? 'item' : 'items'}`}
+    </p>
+  </div>
+
+  <div class="menu-items" data-items>
+    {items.length > 0 ? (
+      items.map(item => (
+        <article class="item-card fade-in visible" data-item-id={item.id} data-category={item.category}>
+          <div class="item-card__media">
+            {item.image_url ? (
+              <img src={item.image_url} alt={item.name} class="item-card__image" loading="lazy" />
+            ) : (
+              <span class="item-card__placeholder" aria-hidden="true"></span>
+            )}
+          </div>
+          <div class="item-card__body">
+            <span class="item-card__category">{item.category}</span>
+            <h3 class="item-card__name">{item.name}</h3>
+            {item.description && <p class="item-card__desc">{item.description}</p>}
+            <p class="item-card__price">{formatPrice(item.price)}</p>
+          </div>
+        </article>
+      ))
+    ) : (
+      <div class="menu-empty" data-empty>
+        <h3>No items in this category yet</h3>
+        <p>Our kitchen is still working on this part of the menu. Please check back soon.</p>
+      </div>
+    )}
+  </div>
+</div>
+
+<script>
+  interface MenuItem {
+    id: number;
+    category: string;
+    name: string;
+    description: string;
+    price: number;
+    image_url: string | null;
+  }
+
+  interface MenuResponse {
+    ok: boolean;
+    error?: string;
+    items?: MenuItem[];
+  }
+
+  const root = document.getElementById('menu-browser');
+
+  if (root) {
+    const brand = root.getAttribute('data-brand') || 'cafe';
+    const allLabel = root.querySelector('.chip')?.textContent?.trim() || 'All Items';
+    const itemsContainer = root.querySelector<HTMLElement>('[data-items]');
+    const status = root.querySelector<HTMLElement>('[data-status]');
+    let controller: AbortController | null = null;
+
+    const currency = new Intl.NumberFormat('en-PH', {
+      style: 'currency',
+      currency: 'PHP',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+    const countLabel = (label: string, count: number) => `${label} — ${count} ${count === 1 ? 'item' : 'items'}`;
+
+    const setActive = (category: string) => {
+      root.querySelectorAll<HTMLElement>('[data-category]').forEach((node) => {
+        if (node.tagName !== 'BUTTON') return;
+        const value = node.getAttribute('data-category') || '';
+        node.classList.toggle('active', value === category);
+        node.setAttribute('aria-pressed', value === category ? 'true' : 'false');
+        if (node.getAttribute('role') === 'tab') {
+          node.setAttribute('aria-selected', value === category ? 'true' : 'false');
+        }
+      });
+    };
+
+    const itemCard = (item: MenuItem) => {
+      const article = document.createElement('article');
+      article.className = 'item-card fade-in visible';
+      article.setAttribute('data-item-id', String(item.id));
+      article.setAttribute('data-category', item.category);
+
+      const media = document.createElement('div');
+      media.className = 'item-card__media';
+      if (item.image_url) {
+        const img = document.createElement('img');
+        img.className = 'item-card__image';
+        img.src = item.image_url;
+        img.alt = item.name;
+        img.loading = 'lazy';
+        media.appendChild(img);
+      } else {
+        const placeholder = document.createElement('span');
+        placeholder.className = 'item-card__placeholder';
+        placeholder.setAttribute('aria-hidden', 'true');
+        media.appendChild(placeholder);
+      }
+
+      const body = document.createElement('div');
+      body.className = 'item-card__body';
+
+      const category = document.createElement('span');
+      category.className = 'item-card__category';
+      category.textContent = item.category;
+
+      const name = document.createElement('h3');
+      name.className = 'item-card__name';
+      name.textContent = item.name;
+
+      body.append(category, name);
+
+      if (item.description) {
+        const desc = document.createElement('p');
+        desc.className = 'item-card__desc';
+        desc.textContent = item.description;
+        body.appendChild(desc);
+      }
+
+      const price = document.createElement('p');
+      price.className = 'item-card__price';
+      price.textContent = currency.format(Number(item.price));
+      body.appendChild(price);
+
+      article.append(media, body);
+      return article;
+    };
+
+    const emptyState = (category: string) => {
+      const empty = document.createElement('div');
+      empty.className = 'menu-empty';
+      empty.setAttribute('data-empty', '');
+
+      const title = document.createElement('h3');
+      title.textContent = category ? 'No items in this category yet' : 'No items on this menu yet';
+
+      const copy = document.createElement('p');
+      copy.textContent = 'Our kitchen is still working on this part of the menu. Please check back soon.';
+
+      empty.append(title, copy);
+      return empty;
+    };
+
+    const load = async (category: string) => {
+      setActive(category);
+      if (status) status.textContent = 'Loading…';
+      if (!itemsContainer) return;
+
+      controller?.abort();
+      controller = new AbortController();
+
+      const query = new URLSearchParams({ brand });
+      if (category) query.set('category', category);
+
+      try {
+        const response = await fetch(`/api/menu?${query.toString()}`, { signal: controller.signal });
+        if (!response.ok) throw new Error('Request failed');
+        const data = (await response.json()) as MenuResponse;
+        const items = data.items || [];
+
+        const fragment = document.createDocumentFragment();
+        if (items.length === 0) {
+          fragment.appendChild(emptyState(category));
+        } else {
+          items.forEach((item) => fragment.appendChild(itemCard(item)));
+        }
+        itemsContainer.replaceChildren(fragment);
+
+        if (status) status.textContent = countLabel(category || allLabel, items.length);
+
+        const url = new URL(window.location.href);
+        if (category) url.searchParams.set('category', category);
+        else url.searchParams.delete('category');
+        window.history.replaceState({}, '', url);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        if (status) status.textContent = 'Could not load the menu. Please try again.';
+      }
+    };
+    const scrollTarget = root.querySelector<HTMLElement>('.menu-toolbar');
+
+    root.addEventListener('click', (event) => {
+      const target = event.target as Element | null;
+      const trigger = target?.closest<HTMLElement>('[data-category]');
+      if (!trigger || !root.contains(trigger)) return;
+      event.preventDefault();
+      load(trigger.getAttribute('data-category') || '');
+      scrollTarget?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+</script>
+
+<style is:global>
+  .menu-categories {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+    margin-bottom: var(--space-3xl);
+  }
+  .product-categories {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .category-card {
+    display: block;
+    width: 100%;
+    text-align: inherit;
+    font-family: inherit;
+    cursor: pointer;
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2xl);
+    color: inherit;
+    transition: var(--transition);
+  }
+  .category-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  }
+  .category-card.active {
+    border-color: var(--color-accent);
+    box-shadow: inset 0 0 0 1px var(--color-accent);
+  }
+  .product-card.category-card {
+    text-align: center;
+  }
+  .category-card__image-wrap {
+    display: block;
+    margin-bottom: var(--space-xl);
+  }
+  .category-card__image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    border-radius: var(--radius-lg);
+  }
+  .category-card__image--all {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-lg);
+    background:
+      linear-gradient(rgba(74, 63, 55, 0.55), rgba(20, 18, 16, 0.75)),
+      url('/images/cafe_bg.jpg') center / cover no-repeat;
+  }
+  .category-card h3 {
+    margin-bottom: var(--space-xs);
+    font-size: 1.15rem;
+  }
+  .product-card.category-card h3 {
+    font-size: 1.1rem;
+  }
+  .category-card__meta {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+  }
+  .menu-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+    padding: var(--space-lg) 0 var(--space-xl);
+    border-top: 1px solid var(--color-border);
+    scroll-margin-top: 88px;
+  }
+  .menu-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+  .chip {
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 0.45rem 1rem;
+    border-radius: 20px;
+    border: 1.5px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .chip:hover {
+    border-color: var(--color-accent);
+    color: var(--color-text);
+  }
+  .chip.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-warm-white);
+  }
+  .menu-status {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+  }
+
+  .menu-items {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+  }
+  .item-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: var(--transition);
+  }
+  .item-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  }
+  .item-card__media {
+    aspect-ratio: 10 / 10;
+    background: var(--color-muted);
+  }
+  .item-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .item-card__placeholder {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--color-muted), var(--color-border));
+  }
+  .item-card__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: var(--space-sm);
+    padding: var(--space-lg) var(--space-xl) var(--space-xl);
+  }
+  .item-card__category {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+  .item-card__name {
+    font-size: 1.05rem;
+  }
+  .item-card__desc {
+    font-size: 0.875rem;
+    flex: 1;
+  }
+  .item-card__price {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+  .menu-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--space-4xl) var(--space-xl);
+    background: var(--color-muted);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+  .menu-empty h3 {
+    margin-bottom: var(--space-sm);
+    font-size: 1.15rem;
+  }
+  .menu-empty p {
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 900px) {
+    .menu-categories,
+    .product-categories,
+    .menu-items {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 560px) {
+    .menu-categories,
+    .product-categories,
+    .menu-items {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
